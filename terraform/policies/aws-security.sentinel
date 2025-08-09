@@ -1,0 +1,46 @@
+# Sentinel policy to enforce security best practices
+# Blocks security groups that expose restricted ports to the public Internet
+
+import "tfplan/v2" as tfplan
+
+restricted = [22, 3389, 1433, 3306, 5432, 6379, 27017]
+
+is_relevant_action = func(r) {
+  r.change.actions contains "create" or
+  r.change.actions contains "update" or
+  r.change.actions contains "replace"
+}
+
+open_to_world = func(ru) {
+  (ru contains "cidr_blocks" and "0.0.0.0/0" in ru.cidr_blocks) or
+  (ru contains "ipv6_cidr_blocks" and "::/0" in ru.ipv6_cidr_blocks)
+}
+
+covers_restricted_port = func(ru) {
+  # Must have from_port; to_port may or may not be present
+  ru contains "from_port" and (
+    (
+      ru contains "to_port" and
+      any restricted as p { ru.from_port <= p and p <= ru.to_port }
+    ) or (
+      # Single-port rule
+      ru.from_port in restricted
+    )
+  )
+}
+
+bad = func(r) {
+  r.change.after contains "ingress" and
+  any r.change.after.ingress as ru {
+    open_to_world(ru) and covers_restricted_port(ru)
+  }
+}
+
+main = rule {
+  all tfplan.resource_changes as _, r {
+    (r.type == "aws_security_group" and is_relevant_action(r)) implies not bad(r)
+  }
+}
+
+# Description
+description = "Prevents overly permissive security group rules for sensitive ports"

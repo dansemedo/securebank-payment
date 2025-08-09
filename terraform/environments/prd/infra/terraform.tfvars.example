@@ -1,0 +1,28 @@
+# Production Environment Variables
+# Copy this file to terraform.tfvars and update values as needed
+
+# Environment Configuration
+environment = "prd"
+
+# AWS Configuration
+aws_region = "us-east-1"
+
+# EC2 Configuration
+instance_type = "t2.small"
+key_name      = "securebank-key-prod"
+
+# VPC Configuration
+vpc_cidr        = "10.1.0.0/16"
+public_subnets  = ["10.1.1.0/24", "10.1.2.0/24"]
+private_subnets = ["10.1.10.0/24", "10.1.11.0/24"]
+
+# DynamoDB Configuration
+dynamodb_billing_mode = "PROVISIONED"
+
+# Tags
+tags = {
+  Environment = "prd"
+  Project     = "securebank-payment"
+  Owner       = "infrastructure-team"
+  CostCenter  = "engineering"
+}
