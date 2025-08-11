@@ -8,7 +8,7 @@ variable "environment" {
 variable "instance_type" {
   description = "EC2 instance type for development"
   type        = string
-  default     = "t2.small"
+  default     = "t2.nano"
 }
 
 variable "key_name" {
