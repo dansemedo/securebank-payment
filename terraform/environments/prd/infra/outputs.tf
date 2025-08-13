@@ -1,40 +1,66 @@
-# Production environment outputs
+# Root module outputs
+
 output "vpc_id" {
   description = "VPC ID"
-  value       = module.securebank_payment.vpc_id
+  value       = module.vpcs.vpc_id
+}
+
+output "vpc_cidr_block" {
+  description = "VPC CIDR block"
+  value       = module.vpcs.vpc_cidr_block
 }
 
 output "public_subnet_ids" {
   description = "Public subnet IDs"
-  value       = module.securebank_payment.public_subnet_ids
+  value       = module.vpcs.public_subnet_ids
 }
 
 output "private_subnet_ids" {
   description = "Private subnet IDs"
-  value       = module.securebank_payment.private_subnet_ids
+  value       = module.vpcs.private_subnet_ids
 }
 
 output "ec2_instance_id" {
   description = "EC2 instance ID"
-  value       = module.securebank_payment.ec2_instance_id
+  value       = module.ec2.instance_id
 }
 
 output "ec2_public_ip" {
   description = "EC2 instance public IP"
-  value       = module.securebank_payment.ec2_public_ip
+  value       = module.ec2.public_ip
 }
 
-output "application_url" {
-  description = "Application URL"
-  value       = "http://${module.securebank_payment.ec2_public_ip}:5000"
+output "ec2_private_ip" {
+  description = "EC2 instance private IP"
+  value       = module.ec2.private_ip
 }
 
 output "dynamodb_table_name" {
   description = "DynamoDB table name"
-  value       = module.securebank_payment.dynamodb_table_name
+  value       = module.dynamodb.table_name
+}
+
+output "dynamodb_table_arn" {
+  description = "DynamoDB table ARN"
+  value       = module.dynamodb.table_arn
+}
+
+output "app_security_group_id" {
+  description = "Application security group ID"
+  value       = module.security.app_security_group_id
+}
+
+output "ec2_role_arn" {
+  description = "EC2 IAM role ARN"
+  value       = module.security.ec2_role_arn
+}
+
+output "application_url" {
+  description = "Application URL"
+  value       = "http://${module.ec2.public_ip}:5000"
 }
 
 output "ssh_command" {
   description = "SSH command to connect to the instance"
-  value       = "ssh -i ~/.ssh/securebank-key-prod.pem ubuntu@${module.securebank_payment.ec2_public_ip}"
+  value       = "ssh -i ~/.ssh/${var.key_name}.pem ubuntu@${module.ec2.public_ip}"
 }
